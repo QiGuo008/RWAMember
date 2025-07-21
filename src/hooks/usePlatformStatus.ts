@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { platformEvents } from '@/lib/platform-events'
 
 interface PlatformData {
   platform: string;
   isConnected: boolean;
   data: string;
-  attestation: any;
+  attestation: unknown;
   verifiedAt: string;
 }
 
@@ -37,7 +37,7 @@ export function usePlatformStatus() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const defaultPlatforms: Platform[] = [
+  const defaultPlatforms: Platform[] = useMemo(() => [
     { 
       id: 1, 
       name: "哔哩哔哩", 
@@ -66,9 +66,9 @@ export function usePlatformStatus() {
       color: "#1890FF", 
       isBound: false
     }
-  ]
+  ], [])
 
-  const fetchPlatformStatus = async () => {
+  const fetchPlatformStatus = useCallback(async () => {
     const token = localStorage.getItem('auth_token')
     if (!token) {
       console.log('No auth token found, using default platforms')
@@ -165,7 +165,7 @@ export function usePlatformStatus() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [defaultPlatforms])
 
   useEffect(() => {
     fetchPlatformStatus()
@@ -177,7 +177,7 @@ export function usePlatformStatus() {
     })
     
     return unsubscribe
-  }, [])
+  }, [fetchPlatformStatus])
 
   return { platforms, loading, error, refetch: fetchPlatformStatus }
 }

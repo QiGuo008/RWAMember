@@ -9,7 +9,8 @@
       "Bash(ls:*)",
       "Bash(pnpm run:*)",
       "Bash(npm install:*)",
-      "Bash(pnpm prisma:*)"
+      "Bash(pnpm prisma:*)",
+      "Bash(pnpm build:*)"
     ],
     "deny": []
   }

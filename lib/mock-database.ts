@@ -1,11 +1,12 @@
 // Database operations for platform verification data
 import { prisma } from './prisma'
+import { Prisma } from '@prisma/client'
 
 export interface PlatformData {
   platform: string;
   isConnected: boolean;
   data: string;
-  attestation: any;
+  attestation: unknown;
   verifiedAt: string;
   vipStatus?: string;
   expiryDate?: string;
@@ -54,7 +55,7 @@ export const getUserPlatforms = async (address: string): Promise<PlatformData[]>
 export const savePlatformVerification = async (
   address: string, 
   platform: string, 
-  attestation: any, 
+  attestation: unknown, 
   verificationData: string
 ): Promise<void> => {
   try {
@@ -73,21 +74,21 @@ export const savePlatformVerification = async (
     let vipStatus = 'Unknown';
     let expiryDate: Date | null = null;
     let level: string | null = null;
-    let parsedData: any = null;
+    let parsedData: Record<string, unknown> | null = null;
 
     try {
-      parsedData = JSON.parse(verificationData);
+      parsedData = JSON.parse(verificationData) as Record<string, unknown>;
       
-      if (platform === 'bilibili') {
-        level = parsedData.current_level || null;
+      if (platform === 'bilibili' && parsedData) {
+        level = (parsedData.current_level as string) || null;
         vipStatus = parsedData.current_level ? `Level ${parsedData.current_level}` : 'Unknown';
         if (parsedData.vipDueDate) {
-          expiryDate = new Date(parseInt(parsedData.vipDueDate));
+          expiryDate = new Date(parseInt(parsedData.vipDueDate as string));
         }
-      } else if (platform === 'youku') {
+      } else if (platform === 'youku' && parsedData) {
         vipStatus = parsedData.is_vip === '1' ? 'VIP Active' : 'Not VIP';
         if (parsedData.exptime) {
-          expiryDate = new Date(parsedData.exptime);
+          expiryDate = new Date(parsedData.exptime as string);
         }
       }
     } catch (error) {
@@ -106,8 +107,8 @@ export const savePlatformVerification = async (
         },
         update: {
           isConnected: true,
-          verificationData: parsedData,
-          attestationData: attestation,
+          verificationData: parsedData as Prisma.InputJsonValue,
+          attestationData: attestation as Prisma.InputJsonValue,
           verifiedAt: new Date(),
           expiresAt: expiryDate
         },
@@ -115,8 +116,8 @@ export const savePlatformVerification = async (
           userId: user!.id,
           platform,
           isConnected: true,
-          verificationData: parsedData,
-          attestationData: attestation,
+          verificationData: parsedData as Prisma.InputJsonValue,
+          attestationData: attestation as Prisma.InputJsonValue,
           expiresAt: expiryDate
         }
       });
@@ -129,7 +130,7 @@ export const savePlatformVerification = async (
           vipStatus,
           level,
           expiryDate,
-          rawData: parsedData
+          rawData: parsedData as Prisma.InputJsonValue
         }
       });
     });

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAccount } from 'wagmi'
 import Header from "@/components/Header"
 import Navigation from "@/components/Navigation"
@@ -41,7 +41,7 @@ const ManagePage = () => {
     iqiyi: { name: '爱奇艺', color: 'bg-orange-500', icon: '📱' }
   }
 
-  const fetchMySharedMemberships = async () => {
+  const fetchMySharedMemberships = useCallback(async () => {
     if (!address) return
     
     try {
@@ -51,7 +51,7 @@ const ManagePage = () => {
     } catch (error) {
       console.error('Error fetching shared memberships:', error)
     }
-  }
+  }, [address])
 
   const handleToggleShare = async (membershipId: string, currentStatus: boolean) => {
     setActionLoading(prev => ({ ...prev, [membershipId]: true }))
@@ -90,7 +90,7 @@ const ManagePage = () => {
     }
     
     loadData()
-  }, [address])
+  }, [address, fetchMySharedMemberships])
 
   if (loading) {
     return (

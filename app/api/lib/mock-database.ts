@@ -5,7 +5,7 @@ export interface PlatformData {
   platform: string;
   isConnected: boolean;
   data: string;
-  attestation: any;
+  attestation: unknown;
   verifiedAt: string;
   vipStatus?: string;
   expiryDate?: string;
@@ -22,7 +22,7 @@ export const getUserPlatforms = (address: string): PlatformData[] => {
 export const savePlatformVerification = (
   address: string, 
   platform: string, 
-  attestation: any, 
+  attestation: unknown, 
   verificationData: string
 ): void => {
   // Initialize user data if doesn't exist

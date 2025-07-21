@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+// import { useState } from "react"
 import { Users, TrendingUp, CreditCard, CircleDollarSign } from "lucide-react"
 import Header from "@/components/Header"
 import Navigation from "@/components/Navigation"
@@ -17,8 +17,7 @@ import { useRouter } from "next/navigation"
 function HomePage() {
   const isMobile = useIsMobile()
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState("all")
-  const { platforms, loading, error, refetch } = usePlatformStatus()
+  const { platforms } = usePlatformStatus()
 
   // Sample data for shared memberships
   const sharedMemberships = [

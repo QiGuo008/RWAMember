@@ -4,8 +4,9 @@ import { prisma } from '../../../../lib/prisma';
 // DELETE /api/share/[id] - Stop sharing a platform
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const params = await context.params;
   try {
     const { id } = params;
     const { address } = await request.json();
@@ -50,8 +51,9 @@ export async function DELETE(
 // PUT /api/share/[id] - Update shared membership
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const params = await context.params;
   try {
     const { id } = params;
     const { address, isActive } = await request.json();

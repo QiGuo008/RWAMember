@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, CreditCard, Share2, Users, Settings } from "lucide-react"
+import { Home, CreditCard, Users, Settings } from "lucide-react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import Link from "next/link"

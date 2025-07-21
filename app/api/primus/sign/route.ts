@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
 // Import Primus Core SDK for server-side signing
-const { PrimusZKTLS } = require('@primuslabs/zktls-js-sdk');
+import { PrimusZKTLS } from '@primuslabs/zktls-js-sdk';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAccount } from 'wagmi'
 import Header from "@/components/Header"
 import Navigation from "@/components/Navigation"
@@ -64,7 +64,7 @@ const MarketPage = () => {
     }
   }
 
-  const fetchUserRentals = async () => {
+  const fetchUserRentals = useCallback(async () => {
     if (!address) return
     
     try {
@@ -74,7 +74,7 @@ const MarketPage = () => {
     } catch (error) {
       console.error('Error fetching user rentals:', error)
     }
-  }
+  }, [address])
 
   const handleRentMembership = async (membershipId: string) => {
     if (!address) {
@@ -121,7 +121,7 @@ const MarketPage = () => {
     }
     
     loadData()
-  }, [address])
+  }, [address, fetchUserRentals])
 
   if (loading) {
     return (

@@ -121,7 +121,7 @@ export const getSharedMemberships = async (
   owner?: string
 ): Promise<SharedMembershipData[]> => {
   try {
-    const whereClause: any = {
+    const whereClause: Record<string, unknown> = {
       isActive: true
     };
 
