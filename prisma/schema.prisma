@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  address   String   @unique @db.VarChar(42)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  platformVerifications PlatformVerification[]
+  sharedMemberships     SharedMembership[]
+  membershipRentals     MembershipRental[]
+
+  @@map("users")
+}
+
+model PlatformVerification {
+  id               Int       @id @default(autoincrement())
+  userId           Int       @map("user_id")
+  platform         String    @db.VarChar(50)
+  isConnected      Boolean   @default(true) @map("is_connected")
+  verificationData Json?     @map("verification_data") @db.JsonB
+  attestationData  Json?     @map("attestation_data") @db.JsonB
+  verifiedAt       DateTime  @default(now()) @map("verified_at") @db.Timestamptz
+  expiresAt        DateTime? @map("expires_at") @db.Timestamptz
+
+  // Relations
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platformStatus PlatformStatus[]
+  sharedMembership SharedMembership?
+
+  @@unique([userId, platform])
+  @@map("platform_verifications")
+}
+
+model PlatformStatus {
+  id             Int      @id @default(autoincrement())
+  verificationId Int      @map("verification_id")
+  platform       String   @db.VarChar(50)
+  vipStatus      String?  @map("vip_status") @db.VarChar(20)
+  level          String?  @db.VarChar(10)
+  expiryDate     DateTime? @map("expiry_date") @db.Date
+  rawData        Json?    @map("raw_data") @db.JsonB
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  verification PlatformVerification @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+
+  @@map("platform_status")
+}
+
+model SharedMembership {
+  id             Int     @id @default(autoincrement())
+  ownerId        Int     @map("owner_id")
+  verificationId Int     @unique @map("verification_id")
+  platform       String  @db.VarChar(50)
+  priceMon       Decimal @default(0.1) @map("price_mon") @db.Decimal(18, 8)
+  durationDays   Int     @default(1) @map("duration_days")
+  isActive       Boolean @default(true) @map("is_active")
+  timesShared    Int     @default(0) @map("times_shared")
+  maxShares      Int     @default(1) @map("max_shares")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  owner        User                   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  verification PlatformVerification   @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+  rentals      MembershipRental[]
+
+  @@map("shared_memberships")
+}
+
+model MembershipRental {
+  id                 Int      @id @default(autoincrement())
+  sharedMembershipId Int      @map("shared_membership_id")
+  renterId           Int      @map("renter_id")
+  renterAddress      String   @map("renter_address") @db.VarChar(42)
+  pricePaid          Decimal  @map("price_paid") @db.Decimal(18, 8)
+  durationDays       Int      @map("duration_days")
+  startsAt           DateTime @default(now()) @map("starts_at") @db.Timestamptz
+  expiresAt          DateTime @map("expires_at") @db.Timestamptz
+  status             String   @default("active") @db.VarChar(20)
+  transactionHash    String?  @map("transaction_hash") @db.VarChar(66)
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  sharedMembership SharedMembership @relation(fields: [sharedMembershipId], references: [id], onDelete: Cascade)
+  renter           User             @relation(fields: [renterId], references: [id], onDelete: Cascade)
+
+  @@map("membership_rentals")
+}

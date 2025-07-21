@@ -153,7 +153,7 @@ const MarketPage = () => {
             <div className="mb-8">
               <h1 className="text-3xl font-bold mb-2">共享市场</h1>
               <p className="text-muted-foreground">
-                租借其他用户的会员权益，价格固定 0.1 MON / 1天
+                租借其他用户的会员权益，今日租借价格0.1 MON / 1天
               </p>
             </div>
 

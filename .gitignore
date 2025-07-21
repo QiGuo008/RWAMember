@@ -117,3 +117,4 @@ out/
 contracts/lib/
 contracts/cache/
 contracts/broadcast/
+/generated/prisma

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { getUserPlatforms } from '../../lib/mock-database';
+import { getUserPlatforms } from '../../../../lib/mock-database';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     }
 
     const address = decoded.address;
-    const platforms = getUserPlatforms(address);
+    const platforms = await getUserPlatforms(address);
 
     return NextResponse.json({ 
       platforms,

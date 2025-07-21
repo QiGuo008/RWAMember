@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { savePlatformVerification } from '../../lib/mock-database';
+import { savePlatformVerification } from '../../../../lib/mock-database';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const address = decoded.address;
 
     // Save platform verification using shared database
-    savePlatformVerification(address, platform, attestation, verificationData);
+    await savePlatformVerification(address, platform, attestation, verificationData);
 
     return NextResponse.json({ 
       success: true,

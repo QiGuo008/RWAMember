@@ -7,7 +7,9 @@
       "Bash(pnpm remove:*)",
       "Bash(pnpm dev:*)",
       "Bash(ls:*)",
-      "Bash(pnpm run:*)"
+      "Bash(pnpm run:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm prisma:*)"
     ],
     "deny": []
   }
