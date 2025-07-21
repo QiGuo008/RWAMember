@@ -1,0 +1,63 @@
+import { Home, CreditCard, Share2, Users, Settings } from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { cn } from "@/lib/utils"
+
+const navItems = [
+  { icon: Home, label: "首页", href: "/", active: true },
+  { icon: CreditCard, label: "平台绑定", href: "/platforms" },
+  { icon: Share2, label: "共享管理", href: "/manage" },
+  { icon: Users, label: "共享市场", href: "/market" },
+  { icon: Settings, label: "设置", href: "/settings" },
+]
+
+const Navigation = () => {
+  const isMobile = useIsMobile()
+  
+  if (isMobile) {
+    return (
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-border z-50">
+        <div className="flex justify-around items-center px-2 py-2">
+          {navItems.map((item) => (
+            <a 
+              key={item.href} 
+              href={item.href}
+              className={cn(
+                "flex flex-col items-center py-1 px-3 rounded-md",
+                item.active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <item.icon className="h-5 w-5" />
+              <span className="text-xs mt-1">{item.label}</span>
+            </a>
+          ))}
+        </div>
+      </nav>
+    )
+  }
+  
+  return (
+    <nav className="hidden md:block bg-white border-r border-border h-[calc(100vh-60px)] w-56 fixed">
+      <div className="p-4">
+        <div className="space-y-1">
+          {navItems.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+                item.active 
+                  ? "bg-primary text-primary-foreground" 
+                  : "hover:bg-secondary text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <item.icon className="h-5 w-5" />
+              <span>{item.label}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </nav>
+  )
+}
+
+export default Navigation
