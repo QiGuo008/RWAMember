@@ -6,7 +6,8 @@
       "Bash(rm:*)",
       "Bash(pnpm remove:*)",
       "Bash(pnpm dev:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(pnpm run:*)"
     ],
     "deny": []
   }

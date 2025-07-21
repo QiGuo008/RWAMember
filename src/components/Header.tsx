@@ -1,9 +1,10 @@
 "use client"
 
-import { Search, Bell, User } from "lucide-react"
+import { Search, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { WalletConnect } from "@/components/WalletConnect"
 import Link from "next/link"
 
 const Header = () => {
@@ -35,10 +36,7 @@ const Header = () => {
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
           </Button>
-          <Button variant="outline" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            {!isMobile && <span>登录 / 注册</span>}
-          </Button>
+          <WalletConnect />
         </div>
       </div>
     </header>

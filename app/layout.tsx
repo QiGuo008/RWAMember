@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import '../src/index.css'
 import { Toaster } from "@/components/ui/toaster"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { Web3Provider } from "@/providers/web3-provider"
 
 export const metadata: Metadata = {
   title: 'RWA Member',
@@ -16,10 +17,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <TooltipProvider>
-          {children}
-          <Toaster />
-        </TooltipProvider>
+        <Web3Provider>
+          <TooltipProvider>
+            {children}
+            <Toaster />
+          </TooltipProvider>
+        </Web3Provider>
       </body>
     </html>
   )

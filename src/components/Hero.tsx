@@ -7,16 +7,16 @@ const Hero = () => {
   const isMobile = useIsMobile()
   
   return (
-    <div className="gradient-bg py-12 md:py-20 text-white">
+    <div className="gradient-bg py-8 md:py-12 text-white">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
           <div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3">
               共享闲置会员资源
               <br />
               <span className="text-[#F59E0B]">最大化</span>价值
             </h1>
-            <p className="text-lg md:text-xl opacity-90 mb-6">
+            <p className="text-base md:text-lg opacity-90 mb-4">
               轻松共享您的视频平台VIP会员，获取额外收益，
               或以低成本享受多平台高级内容。
             </p>

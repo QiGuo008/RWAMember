@@ -11,46 +11,12 @@ import StatsCard from "@/components/StatsCard"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { usePlatformStatus } from "@/hooks/usePlatformStatus"
 
 function HomePage() {
   const isMobile = useIsMobile()
   const [activeTab, setActiveTab] = useState("all")
-
-  // Sample data for platforms
-  const platforms = [
-    { 
-      id: 1, 
-      name: "哔哩哔哩", 
-      logo: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=48&h=48&fit=crop&auto=format", 
-      color: "#FB7299", 
-      isBound: true, 
-      membershipLevel: "大会员",
-      expiryDate: "2026-03-30"
-    },
-    { 
-      id: 2, 
-      name: "腾讯视频", 
-      logo: "https://images.unsplash.com/photo-1611162616305-c69b3267e129?w=48&h=48&fit=crop&auto=format", 
-      color: "#FF6022", 
-      isBound: true, 
-      membershipLevel: "超级VIP",
-      expiryDate: "2025-12-15"
-    },
-    { 
-      id: 3, 
-      name: "爱奇艺", 
-      logo: "https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?w=48&h=48&fit=crop&auto=format", 
-      color: "#00BE06", 
-      isBound: false
-    },
-    { 
-      id: 4, 
-      name: "优酷", 
-      logo: "https://images.unsplash.com/photo-1611162617263-4ec3060a058e?w=48&h=48&fit=crop&auto=format", 
-      color: "#1890FF", 
-      isBound: false
-    }
-  ]
+  const { platforms, loading, error } = usePlatformStatus()
 
   // Sample data for shared memberships
   const sharedMemberships = [
