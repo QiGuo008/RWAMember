@@ -35,8 +35,21 @@ export const shareUserPlatform = async (
   platform: string
 ): Promise<SharedMembershipData> => {
   try {
-    // Find user by address
+    // Find user by address first
     const user = await prisma.user.findUnique({
+      where: { address },
+      include: {
+        platformVerifications: true
+      }
+    });
+
+
+    if (!user) {
+      throw new Error(`User with address ${address} not found`);
+    }
+
+    // Now get user with filtered platform verifications
+    const userWithPlatform = await prisma.user.findUnique({
       where: { address },
       include: {
         platformVerifications: {
@@ -54,16 +67,16 @@ export const shareUserPlatform = async (
       }
     });
 
-    if (!user || user.platformVerifications.length === 0) {
-      throw new Error('Platform not verified or not connected');
+    if (!userWithPlatform || userWithPlatform.platformVerifications.length === 0) {
+      throw new Error(`Platform ${platform} not verified or not connected for address ${address}`);
     }
 
-    const verification = user.platformVerifications[0];
+    const verification = userWithPlatform.platformVerifications[0];
     
     // Check if already sharing this platform
     const existingShare = await prisma.sharedMembership.findFirst({
       where: {
-        ownerId: user.id,
+        ownerId: userWithPlatform.id,
         platform,
         isActive: true
       }
@@ -76,7 +89,7 @@ export const shareUserPlatform = async (
     // Create new shared membership
     const sharedMembership = await prisma.sharedMembership.create({
       data: {
-        ownerId: user.id,
+        ownerId: userWithPlatform.id,
         verificationId: verification.id,
         platform,
         priceMon: 0.1,

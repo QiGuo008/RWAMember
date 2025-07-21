@@ -13,12 +13,28 @@ export function WalletConnect() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if user is already authenticated
+    // Check if user is already authenticated and token matches current address
     const token = localStorage.getItem('auth_token');
-    if (token) {
-      setIsAuthenticated(true);
+    if (token && address) {
+      try {
+        // Decode JWT token to verify it matches current address
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.address === address) {
+          setIsAuthenticated(true);
+        } else {
+          // Address mismatch, clear token and reset auth state
+          localStorage.removeItem('auth_token');
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        // Invalid token, clear it
+        localStorage.removeItem('auth_token');
+        setIsAuthenticated(false);
+      }
+    } else {
+      setIsAuthenticated(false);
     }
-  }, []);
+  }, [address]); // Watch for address changes
 
   const handleAuthenticate = async () => {
     if (!address) return;

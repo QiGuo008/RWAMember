@@ -13,6 +13,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 5. 连接验证后，需要从后端获取数据，在页面上显示已经连接和vip时间
 6. 保密配置数据放在.env
 7. 绑定验证后的平台，用户可以点击共享，然后就分享到共享数据库里，在共享市场显示
+8. 用户购买账号时，需要支付0.1Mon购买，然后获得账号手机号，输入登录
+9. 账号拥有者提交验证码，给购买者使用登录。完成账号共享
 
 ## primus返回数据
 1. bilibili：  "data": "{\"current_level\":\"6\",\"vipDueDate\":\"1776700800000\"}",、

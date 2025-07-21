@@ -262,6 +262,26 @@ export function PlatformVerification() {
       return;
     }
 
+    // Additional validation - check if platform is actually connected
+    const status = getPlatformStatus(platformId);
+    console.log(`Share validation for ${platformId}:`, {
+      address,
+      platformId,
+      status,
+      isConnected: status?.isConnected,
+      platformsLength: platforms.length,
+      allPlatforms: platforms
+    });
+    
+    if (!status?.isConnected) {
+      toast({
+        title: '验证错误',
+        description: `${platformId} 平台未连接，请先验证平台后再分享`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setShareLoading(prev => ({ ...prev, [platformId]: true }));
 
     try {
@@ -323,9 +343,19 @@ export function PlatformVerification() {
       }
     } catch (error) {
       console.error('Error handling share platform:', error);
+      
+      let errorMessage = 'Failed to handle share operation';
+      if (error instanceof Error) {
+        if (error.message.includes('not verified or not connected')) {
+          errorMessage = `请先验证 ${platformId} 平台后再进行分享`;
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: '操作失败',
-        description: error instanceof Error ? error.message : 'Failed to handle share operation',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -476,6 +506,12 @@ export function PlatformVerification() {
                             : '分享到市场 (0.1 MON/天)'
                         }
                       </Button>
+                    )}
+                    
+                    {!status?.isConnected && status && (
+                      <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
+                        Platform not connected. Please verify first.
+                      </div>
                     )}
                   </div>
                 </div>

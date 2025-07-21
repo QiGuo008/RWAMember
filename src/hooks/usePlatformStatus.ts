@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useAccount } from 'wagmi'
 import { platformEvents } from '@/lib/platform-events'
 
 interface PlatformData {
@@ -33,6 +34,7 @@ export interface Platform {
 }
 
 export function usePlatformStatus() {
+  const { address } = useAccount()
   const [platforms, setPlatforms] = useState<Platform[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -76,8 +78,24 @@ export function usePlatformStatus() {
     }
 
     const token = localStorage.getItem('auth_token')
-    if (!token) {
-      console.log('No auth token found, using default platforms')
+    if (!token || !address) {
+      console.log('No auth token or address found, using default platforms')
+      setPlatforms(defaultPlatforms)
+      return
+    }
+
+    // Verify token matches current address
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      if (payload.address !== address) {
+        console.log('Token address mismatch, clearing token and using default platforms')
+        localStorage.removeItem('auth_token')
+        setPlatforms(defaultPlatforms)
+        return
+      }
+    } catch (error) {
+      console.log('Invalid token, clearing and using default platforms')
+      localStorage.removeItem('auth_token')
       setPlatforms(defaultPlatforms)
       return
     }
@@ -171,7 +189,7 @@ export function usePlatformStatus() {
     } finally {
       setLoading(false)
     }
-  }, [defaultPlatforms])
+  }, [defaultPlatforms, address])
 
   useEffect(() => {
     fetchPlatformStatus()
