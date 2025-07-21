@@ -7,7 +7,7 @@ const Hero = () => {
   const isMobile = useIsMobile()
   
   return (
-    <div className="gradient-bg py-8 md:py-12 text-white">
+    <div className="gradient-bg md:py-2 text-white">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
           <div>
@@ -35,7 +35,7 @@ const Hero = () => {
               <img 
                 src="https://images.unsplash.com/photo-1586899028174-e7098604235b?w=800&h=600&fit=crop" 
                 alt="Streaming services illustration" 
-                className="rounded-lg shadow-lg relative z-10 mx-auto"
+                className="rounded-lg shadow-lg relative z-10 mx-auto w-100 h-80 object-cover"
               />
             </div>
           )}

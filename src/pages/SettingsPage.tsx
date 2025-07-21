@@ -10,7 +10,7 @@ const SettingsPage = () => {
   return (
     <div className="min-h-screen bg-[#F3F4F6]">
       <Header />
-      <div className="flex">
+      <div className="flex pt-16">
         <Navigation />
         
         <div className={`flex-1 ${!isMobile ? "ml-56" : ""}`}>

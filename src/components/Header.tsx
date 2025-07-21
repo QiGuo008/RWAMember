@@ -11,7 +11,7 @@ const Header = () => {
   const isMobile = useIsMobile()
 
   return (
-    <header className="border-b border-border py-3 px-4 bg-white">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-border py-3 px-4 bg-white">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Link href="/" className="text-xl font-bold text-primary">
