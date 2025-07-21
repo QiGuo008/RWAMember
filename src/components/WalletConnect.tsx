@@ -26,7 +26,7 @@ export function WalletConnect() {
           localStorage.removeItem('auth_token');
           setIsAuthenticated(false);
         }
-      } catch (error) {
+      } catch {
         // Invalid token, clear it
         localStorage.removeItem('auth_token');
         setIsAuthenticated(false);

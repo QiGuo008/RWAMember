@@ -62,7 +62,7 @@ const MarketPage = () => {
     iqiyi: { name: '爱奇艺', color: 'bg-orange-500', icon: '📱' }
   }
 
-  const fetchSharedMemberships = async () => {
+  const fetchSharedMemberships = useCallback(async () => {
     try {
       const response = await fetch('/api/share')
       const data = await response.json()
@@ -70,7 +70,7 @@ const MarketPage = () => {
     } catch (error) {
       console.error('Error fetching shared memberships:', error)
     }
-  }
+  }, [])
 
   const fetchUserRentals = useCallback(async () => {
     if (!address) return
@@ -147,7 +147,7 @@ const MarketPage = () => {
 
       processRental()
     }
-  }, [isTxSuccess, txHash, rentingMembershipId, address])
+  }, [isTxSuccess, txHash, rentingMembershipId, address, fetchSharedMemberships, fetchUserRentals])
 
   // Handle transaction error
   useEffect(() => {
@@ -166,7 +166,7 @@ const MarketPage = () => {
     }
     
     loadData()
-  }, [address, fetchUserRentals])
+  }, [address, fetchUserRentals, fetchSharedMemberships])
 
   if (loading) {
     return (

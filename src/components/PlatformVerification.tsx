@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,6 +54,49 @@ export function PlatformVerification() {
   const [sharedPlatforms, setSharedPlatforms] = useState<{ [key: string]: boolean }>({});
   const [primusZKTLS, setPrimusZKTLS] = useState<PrimusZKTLS | null>(null);
 
+  const fetchPlatformData = async () => {
+    try {
+      console.log('Fetching platform data...');
+      const response = await fetch('/api/platforms/status', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Platform data received:', data);
+        setPlatforms(data.platforms || []);
+      } else {
+        console.error('Failed to fetch platforms:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Failed to fetch platform data:', error);
+    }
+  };
+
+  const fetchSharedPlatforms = useCallback(async () => {
+    if (!address) return;
+    
+    try {
+      const response = await fetch(`/api/share?owner=${address}`);
+      const data = await response.json();
+      const shared: { [key: string]: boolean } = {};
+      
+      if (data.sharedMemberships) {
+        data.sharedMemberships.forEach((membership: { isActive: boolean; platform: string }) => {
+          if (membership.isActive) {
+            shared[membership.platform] = true;
+          }
+        });
+      }
+      
+      setSharedPlatforms(shared);
+    } catch (error) {
+      console.error('Failed to fetch shared platforms:', error);
+    }
+  }, [address]);
+
   useEffect(() => {
     // Initialize Primus SDK
     const initPrimus = async () => {
@@ -92,50 +135,7 @@ export function PlatformVerification() {
       fetchPlatformData();
       fetchSharedPlatforms();
     }
-  }, [isConnected, address]);
-
-  const fetchPlatformData = async () => {
-    try {
-      console.log('Fetching platform data...');
-      const response = await fetch('/api/platforms/status', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Platform data received:', data);
-        setPlatforms(data.platforms || []);
-      } else {
-        console.error('Failed to fetch platforms:', response.status, response.statusText);
-      }
-    } catch (error) {
-      console.error('Failed to fetch platform data:', error);
-    }
-  };
-
-  const fetchSharedPlatforms = async () => {
-    if (!address) return;
-    
-    try {
-      const response = await fetch(`/api/share?owner=${address}`);
-      const data = await response.json();
-      const shared: { [key: string]: boolean } = {};
-      
-      if (data.sharedMemberships) {
-        data.sharedMemberships.forEach((membership: { isActive: boolean; platform: string }) => {
-          if (membership.isActive) {
-            shared[membership.platform] = true;
-          }
-        });
-      }
-      
-      setSharedPlatforms(shared);
-    } catch (error) {
-      console.error('Failed to fetch shared platforms:', error);
-    }
-  };
+  }, [isConnected, address, fetchSharedPlatforms]);
 
   const handleVerifyPlatform = async (platformId: string, templateId: string) => {
     if (!primusZKTLS || !address) {

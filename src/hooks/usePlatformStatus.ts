@@ -93,7 +93,7 @@ export function usePlatformStatus() {
         setPlatforms(defaultPlatforms)
         return
       }
-    } catch (error) {
+    } catch {
       console.log('Invalid token, clearing and using default platforms')
       localStorage.removeItem('auth_token')
       setPlatforms(defaultPlatforms)
