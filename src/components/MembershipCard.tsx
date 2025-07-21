@@ -1,6 +1,9 @@
+"use client"
+
 import { Star, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useRouter } from "next/navigation"
 
 interface MembershipCardProps {
   platformName: string
@@ -11,6 +14,7 @@ interface MembershipCardProps {
   totalRatings: number
   duration: string
   availability: "available" | "busy" | "limited"
+  onClick?: () => void
 }
 
 const MembershipCard: React.FC<MembershipCardProps> = ({
@@ -22,7 +26,10 @@ const MembershipCard: React.FC<MembershipCardProps> = ({
   totalRatings,
   duration,
   availability,
+  onClick,
 }) => {
+  const router = useRouter()
+  
   const availabilityMap = {
     available: { label: "可用", variant: "outline", className: "border-green-500 text-green-600" },
     busy: { label: "繁忙", variant: "outline", className: "border-red-500 text-red-600" },
@@ -30,6 +37,14 @@ const MembershipCard: React.FC<MembershipCardProps> = ({
   }
   
   const availabilityInfo = availabilityMap[availability]
+  
+  const handlePurchaseClick = () => {
+    if (onClick) {
+      onClick()
+    } else {
+      router.push('/market')
+    }
+  }
   
   return (
     <div className="membership-card">
@@ -68,8 +83,11 @@ const MembershipCard: React.FC<MembershipCardProps> = ({
         <div className="text-lg font-bold text-primary">
           ¥{price.toFixed(2)}
         </div>
-        <Button className="btn-orange">
-          立即共享
+        <Button 
+          className="btn-orange"
+          onClick={handlePurchaseClick}
+        >
+          立即购买
         </Button>
       </div>
     </div>

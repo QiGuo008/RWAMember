@@ -2,9 +2,11 @@
 
 import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useRouter } from "next/navigation"
 
 const Hero = () => {
   const isMobile = useIsMobile()
+  const router = useRouter()
   
   return (
     <div className="gradient-bg md:py-2 text-white">
@@ -21,8 +23,19 @@ const Hero = () => {
               或以低成本享受多平台高级内容。
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="btn-orange">开始共享</Button>
-              <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white/10">
+              <Button 
+                size="lg" 
+                className="btn-orange"
+                onClick={() => router.push('/platforms')}
+              >
+                开始共享
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="bg-transparent border-white text-white hover:bg-white/10"
+                onClick={() => router.push('/market')}
+              >
                 寻找会员
               </Button>
             </div>

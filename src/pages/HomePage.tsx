@@ -128,7 +128,12 @@ function HomePage() {
                 <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="section-title">热门共享会员</h2>
-                    <Button variant="outline">查看全部</Button>
+                    <Button 
+                      variant="outline"
+                      onClick={() => router.push('/market')}
+                    >
+                      查看全部
+                    </Button>
                   </div>
                   
                   <Tabs defaultValue="all" className="mb-6">
@@ -204,9 +209,23 @@ function HomePage() {
             </div>
             
             <div className="bg-white rounded-lg p-6 shadow-sm mt-8">
-              <h2 className="section-title">共享指南</h2>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="section-title">共享指南</h2>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => router.push('/platforms')}
+                  >
+                    立即开始
+                  </Button>
+                </div>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="border border-border rounded-lg p-4">
+                <div 
+                  className="border border-border rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => router.push('/platforms')}
+                >
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                     <span className="text-primary text-xl font-bold">1</span>
                   </div>
@@ -215,7 +234,10 @@ function HomePage() {
                     简单几步绑定您的平台账号，系统将自动验证您的会员状态。
                   </p>
                 </div>
-                <div className="border border-border rounded-lg p-4">
+                <div 
+                  className="border border-border rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => router.push('/manage')}
+                >
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                     <span className="text-primary text-xl font-bold">2</span>
                   </div>
@@ -224,7 +246,10 @@ function HomePage() {
                     设置共享价格、时间段和可用性，灵活控制您的共享选项。
                   </p>
                 </div>
-                <div className="border border-border rounded-lg p-4">
+                <div 
+                  className="border border-border rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => router.push('/market')}
+                >
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                     <span className="text-primary text-xl font-bold">3</span>
                   </div>

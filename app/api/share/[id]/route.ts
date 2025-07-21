@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sharedMemberships } from '../route';
+import { prisma } from '../../../../lib/prisma';
 
 // DELETE /api/share/[id] - Stop sharing a platform
 export async function DELETE(
@@ -14,17 +14,29 @@ export async function DELETE(
       return NextResponse.json({ error: 'Address is required' }, { status: 400 });
     }
 
-    const shareIndex = sharedMemberships.findIndex(
-      s => s.id === id && s.ownerId === address
-    );
+    const membershipId = parseInt(id);
+    
+    // Find shared membership and verify ownership
+    const sharedMembership = await prisma.sharedMembership.findFirst({
+      where: {
+        id: membershipId,
+        owner: {
+          address: address
+        }
+      }
+    });
 
-    if (shareIndex === -1) {
+    if (!sharedMembership) {
       return NextResponse.json({ error: 'Shared membership not found' }, { status: 404 });
     }
 
     // Mark as inactive instead of deleting
-    sharedMemberships[shareIndex].isActive = false;
-    sharedMemberships[shareIndex].updatedAt = new Date().toISOString();
+    await prisma.sharedMembership.update({
+      where: { id: membershipId },
+      data: {
+        isActive: false
+      }
+    });
 
     return NextResponse.json({ 
       message: 'Stopped sharing platform successfully' 
@@ -48,23 +60,62 @@ export async function PUT(
       return NextResponse.json({ error: 'Address is required' }, { status: 400 });
     }
 
-    const shareIndex = sharedMemberships.findIndex(
-      s => s.id === id && s.ownerId === address
-    );
+    const membershipId = parseInt(id);
+    
+    // Find shared membership and verify ownership
+    const existingMembership = await prisma.sharedMembership.findFirst({
+      where: {
+        id: membershipId,
+        owner: {
+          address: address
+        }
+      }
+    });
 
-    if (shareIndex === -1) {
+    if (!existingMembership) {
       return NextResponse.json({ error: 'Shared membership not found' }, { status: 404 });
     }
 
     // Update membership
-    if (typeof isActive === 'boolean') {
-      sharedMemberships[shareIndex].isActive = isActive;
-    }
-    sharedMemberships[shareIndex].updatedAt = new Date().toISOString();
+    const updatedMembership = await prisma.sharedMembership.update({
+      where: { id: membershipId },
+      data: {
+        ...(typeof isActive === 'boolean' && { isActive })
+      },
+      include: {
+        owner: true,
+        verification: {
+          include: {
+            platformStatus: {
+              orderBy: { createdAt: 'desc' },
+              take: 1
+            }
+          }
+        }
+      }
+    });
+
+    const status = updatedMembership.verification.platformStatus[0];
 
     return NextResponse.json({ 
       message: 'Shared membership updated successfully',
-      sharedMembership: sharedMemberships[shareIndex]
+      sharedMembership: {
+        id: updatedMembership.id,
+        ownerId: updatedMembership.owner.address,
+        platform: updatedMembership.platform,
+        priceMon: Number(updatedMembership.priceMon),
+        durationDays: updatedMembership.durationDays,
+        isActive: updatedMembership.isActive,
+        timesShared: updatedMembership.timesShared,
+        maxShares: updatedMembership.maxShares,
+        createdAt: updatedMembership.createdAt.toISOString(),
+        updatedAt: updatedMembership.updatedAt.toISOString(),
+        platformData: {
+          platform: updatedMembership.verification.platform,
+          vipStatus: status?.vipStatus || 'Unknown',
+          expiryDate: status?.expiryDate?.toLocaleDateString() || 'Unknown'
+        }
+      }
     });
   } catch (error) {
     console.error('Error updating shared membership:', error);
