@@ -12,6 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 4. 优酷也是如此连接，验证的，保存的
 5. 连接验证后，需要从后端获取数据，在页面上显示已经连接和vip时间
 6. 保密配置数据放在.env
+7. 绑定验证后的平台，用户可以点击共享，然后就分享到共享数据库里，在共享市场显示
 
 ## primus返回数据
 1. bilibili：  "data": "{\"current_level\":\"6\",\"vipDueDate\":\"1776700800000\"}",、

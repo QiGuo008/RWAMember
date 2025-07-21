@@ -16,6 +16,10 @@ interface ParsedPlatformData {
   vipDueDate?: string;
   exptime?: string;
   is_vip?: string;
+  vip_status?: string;
+  expire_time?: string;
+  vip_type?: string;
+  vip_level?: string;
 }
 
 export interface Platform {
@@ -97,6 +101,8 @@ export function usePlatformStatus() {
           const defaultName = defaultPlatform.name.toLowerCase()
           return platformName.includes('bilibili') && defaultName.includes('哔哩哔哩') ||
                  platformName.includes('youku') && defaultName.includes('优酷') ||
+                 platformName.includes('tencent') && defaultName.includes('腾讯视频') ||
+                 platformName.includes('iqiyi') && defaultName.includes('爱奇艺') ||
                  platformName === defaultName
         })
 
@@ -122,6 +128,26 @@ export function usePlatformStatus() {
                 isBound: true,
                 membershipLevel: 'VIP会员',
                 expiryDate: parsedData.exptime
+              }
+            }
+            
+            // Handle tencent data format
+            if ((parsedData.is_vip === '1' || parsedData.vip_status === 'active') && (parsedData.exptime || parsedData.expire_time)) {
+              return {
+                ...defaultPlatform,
+                isBound: true,
+                membershipLevel: parsedData.vip_type || 'VIP会员',
+                expiryDate: parsedData.exptime || parsedData.expire_time
+              }
+            }
+            
+            // Handle iqiyi data format
+            if ((parsedData.is_vip === '1' || parsedData.vip_status === 'active') && (parsedData.exptime || parsedData.expire_time)) {
+              return {
+                ...defaultPlatform,
+                isBound: true,
+                membershipLevel: parsedData.vip_level || 'VIP会员',
+                expiryDate: parsedData.exptime || parsedData.expire_time
               }
             }
           } catch (e) {

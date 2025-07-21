@@ -12,9 +12,11 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { usePlatformStatus } from "@/hooks/usePlatformStatus"
+import { useRouter } from "next/navigation"
 
 function HomePage() {
   const isMobile = useIsMobile()
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState("all")
   const { platforms, loading, error, refetch } = usePlatformStatus()
 
@@ -193,7 +195,7 @@ function HomePage() {
                         isBound={platform.isBound}
                         membershipLevel={platform.membershipLevel}
                         expiryDate={platform.expiryDate}
-                        onClick={() => console.log(`Clicked on platform: ${platform.name}`)}
+                        onClick={() => router.push('/platforms')}
                       />
                     ))}
                   </div>

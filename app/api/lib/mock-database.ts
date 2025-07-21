@@ -43,6 +43,12 @@ export const savePlatformVerification = (
     } else if (platform === 'youku') {
       vipStatus = parsedData.is_vip === '1' ? 'VIP Active' : 'Not VIP';
       expiryDate = parsedData.exptime || 'Unknown';
+    } else if (platform === 'tencent') {
+      vipStatus = (parsedData.is_vip === '1' || parsedData.vip_status === 'active') ? 'VIP Active' : 'Not VIP';
+      expiryDate = parsedData.exptime || parsedData.expire_time || 'Unknown';
+    } else if (platform === 'iqiyi') {
+      vipStatus = (parsedData.is_vip === '1' || parsedData.vip_status === 'active') ? 'VIP Active' : 'Not VIP';
+      expiryDate = parsedData.exptime || parsedData.expire_time || 'Unknown';
     }
   } catch (error) {
     console.error('Error parsing verification data:', error);
