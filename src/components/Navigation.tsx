@@ -1,6 +1,9 @@
+"use client"
+
 import { Home, CreditCard, Share2, Users, Settings } from "lucide-react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 const navItems = [
   { icon: Home, label: "首页", href: "/", active: true },
@@ -18,7 +21,7 @@ const Navigation = () => {
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-border z-50">
         <div className="flex justify-around items-center px-2 py-2">
           {navItems.map((item) => (
-            <a 
+            <Link 
               key={item.href} 
               href={item.href}
               className={cn(
@@ -28,7 +31,7 @@ const Navigation = () => {
             >
               <item.icon className="h-5 w-5" />
               <span className="text-xs mt-1">{item.label}</span>
-            </a>
+            </Link>
           ))}
         </div>
       </nav>
@@ -40,7 +43,7 @@ const Navigation = () => {
       <div className="p-4">
         <div className="space-y-1">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               className={cn(
@@ -52,7 +55,7 @@ const Navigation = () => {
             >
               <item.icon className="h-5 w-5" />
               <span>{item.label}</span>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

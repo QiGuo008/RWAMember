@@ -1,8 +1,10 @@
+"use client"
+
 import { Search, Bell, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { Link } from "react-router-dom"
+import Link from "next/link"
 
 const Header = () => {
   const isMobile = useIsMobile()
@@ -11,7 +13,7 @@ const Header = () => {
     <header className="border-b border-border py-3 px-4 bg-white">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <Link to="/" className="text-xl font-bold text-primary">
+          <Link href="/" className="text-xl font-bold text-primary">
             会员<span className="text-[#F59E0B]">RWA</span>共享平台
           </Link>
         </div>

@@ -3,6 +3,8 @@
   This is a core hook for mobile detection and should remain unchanged.
 */
 
+"use client"
+
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768

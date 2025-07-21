@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from "react"
 import { Users, TrendingUp, CreditCard, CircleDollarSign } from "lucide-react"
 import Header from "@/components/Header"
