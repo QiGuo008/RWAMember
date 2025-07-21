@@ -224,4 +224,9 @@ const ManagePage = () => {
   )
 }
 
+// Disable SSR for this page to prevent wagmi hook issues
+ManagePage.getInitialProps = async () => {
+  return {}
+}
+
 export default ManagePage

@@ -33,4 +33,9 @@ const SettingsPage = () => {
   )
 }
 
+// Disable SSR for this page to prevent wagmi hook issues
+SettingsPage.getInitialProps = async () => {
+  return {}
+}
+
 export default SettingsPage

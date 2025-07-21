@@ -124,7 +124,7 @@ export function PlatformVerification() {
       const shared: { [key: string]: boolean } = {};
       
       if (data.sharedMemberships) {
-        data.sharedMemberships.forEach((membership: any) => {
+        data.sharedMemberships.forEach((membership: { isActive: boolean; platform: string }) => {
           if (membership.isActive) {
             shared[membership.platform] = true;
           }

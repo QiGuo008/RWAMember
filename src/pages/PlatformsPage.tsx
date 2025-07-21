@@ -28,4 +28,9 @@ const PlatformsPage = () => {
   )
 }
 
+// Disable SSR for this page to prevent wagmi hook issues
+PlatformsPage.getInitialProps = async () => {
+  return {}
+}
+
 export default PlatformsPage

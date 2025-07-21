@@ -295,4 +295,9 @@ const MarketPage = () => {
   )
 }
 
+// Disable SSR for this page to prevent wagmi hook issues
+MarketPage.getInitialProps = async () => {
+  return {}
+}
+
 export default MarketPage

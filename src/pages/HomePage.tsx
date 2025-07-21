@@ -137,16 +137,16 @@ function HomePage() {
                   
                   <Tabs defaultValue="all" className="mb-6">
                     <TabsList className="mb-4">
-                      <TabsTrigger value="all" onClick={() => setActiveTab("all")}>
+                      <TabsTrigger value="all">
                         全部
                       </TabsTrigger>
-                      <TabsTrigger value="video" onClick={() => setActiveTab("video")}>
+                      <TabsTrigger value="video">
                         视频平台
                       </TabsTrigger>
-                      <TabsTrigger value="music" onClick={() => setActiveTab("music")}>
+                      <TabsTrigger value="music">
                         音乐平台
                       </TabsTrigger>
-                      <TabsTrigger value="reading" onClick={() => setActiveTab("reading")}>
+                      <TabsTrigger value="reading">
                         阅读平台
                       </TabsTrigger>
                     </TabsList>
@@ -267,6 +267,11 @@ function HomePage() {
       {isMobile && <div className="h-16"></div>}
     </div>
   )
+}
+
+// Disable SSR for this page to prevent wagmi hook issues
+HomePage.getInitialProps = async () => {
+  return {}
 }
 
 export default HomePage

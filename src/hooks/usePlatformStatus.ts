@@ -69,6 +69,12 @@ export function usePlatformStatus() {
   ], [])
 
   const fetchPlatformStatus = useCallback(async () => {
+    // Check if we're in browser environment
+    if (typeof window === 'undefined') {
+      setPlatforms(defaultPlatforms)
+      return
+    }
+
     const token = localStorage.getItem('auth_token')
     if (!token) {
       console.log('No auth token found, using default platforms')
