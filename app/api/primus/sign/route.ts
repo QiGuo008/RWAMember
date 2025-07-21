@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-// For server-side Primus SDK (you'll need to implement this based on your needs)
-// const { PrimusZKTLS } = require('@primuslabs/zktls-core-sdk');
+// Import Primus Core SDK for server-side signing
+const { PrimusZKTLS } = require('@primuslabs/zktls-js-sdk');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -27,21 +27,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing signParams' }, { status: 400 });
     }
 
-    // In production, you would use the Primus Core SDK here
-    // For now, we'll return the signed params (this is a mock implementation)
-    // const primusZKTLS = new PrimusZKTLS();
-    // await primusZKTLS.init(appId, appSecret);
-    // const signResult = await primusZKTLS.sign(signParams);
+    // Use the actual Primus Core SDK for signing
+    const appId = process.env.NEXT_PUBLIC_PRIMUS_APP_ID;
+    const appSecret = process.env.PRIMUS_APP_SECRET;
 
-    // Mock implementation - you need to replace this with actual Primus Core SDK usage
-    const mockSignResult = JSON.stringify({
-      ...JSON.parse(signParams),
-      signature: 'mock-signature',
-      timestamp: Date.now(),
-    });
+    if (!appId || !appSecret) {
+      console.error('Missing Primus configuration');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
+    // Initialize Primus SDK with app secret for server-side signing
+    const primusZKTLS = new PrimusZKTLS();
+    await primusZKTLS.init(appId, appSecret);
+    
+    // Sign the request parameters
+    const signResult = await primusZKTLS.sign(signParams);
 
     return NextResponse.json({ 
-      signResult: mockSignResult 
+      signResult 
     });
   } catch (error) {
     console.error('Primus sign error:', error);

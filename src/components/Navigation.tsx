@@ -27,7 +27,7 @@ const Navigation = () => {
               href={item.href}
               className={cn(
                 "flex flex-col items-center py-1 px-3 rounded-md",
-                item.active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                pathname === item.href ? "text-primary" : "text-muted-foreground hover:text-foreground"
               )}
             >
               <item.icon className="h-5 w-5" />
@@ -49,7 +49,7 @@ const Navigation = () => {
               href={item.href}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
-                item.active 
+                pathname === item.href 
                   ? "bg-primary text-primary-foreground" 
                   : "hover:bg-secondary text-muted-foreground hover:text-foreground"
               )}

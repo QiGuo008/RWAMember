@@ -35,7 +35,7 @@ const Hero = () => {
               <img 
                 src="https://images.unsplash.com/photo-1586899028174-e7098604235b?w=800&h=600&fit=crop" 
                 alt="Streaming services illustration" 
-                className="rounded-lg shadow-lg relative z-10 mx-auto w-100 h-80 object-cover"
+                className="rounded-lg shadow-lg relative z-10 mx-auto w-80 h-60 object-cover"
               />
             </div>
           )}

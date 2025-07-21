@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { platformEvents } from '@/lib/platform-events'
 
 interface PlatformData {
   platform: string;
@@ -64,8 +65,9 @@ export function usePlatformStatus() {
   ]
 
   const fetchPlatformStatus = async () => {
-    const token = localStorage.getItem('jwt_token')
+    const token = localStorage.getItem('auth_token')
     if (!token) {
+      console.log('No auth token found, using default platforms')
       setPlatforms(defaultPlatforms)
       return
     }
@@ -85,6 +87,7 @@ export function usePlatformStatus() {
       }
 
       const data = await response.json()
+      console.log('Platform status data received:', data)
       const backendPlatforms = data.platforms as PlatformData[]
 
       // Merge backend data with default platforms
@@ -140,6 +143,14 @@ export function usePlatformStatus() {
 
   useEffect(() => {
     fetchPlatformStatus()
+    
+    // Subscribe to platform verification events
+    const unsubscribe = platformEvents.subscribe(() => {
+      console.log('Platform verification event received, refreshing data...')
+      fetchPlatformStatus()
+    })
+    
+    return unsubscribe
   }, [])
 
   return { platforms, loading, error, refetch: fetchPlatformStatus }

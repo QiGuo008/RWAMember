@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
+import { platformEvents } from '@/lib/platform-events';
 
 // Import Primus SDK
 import { PrimusZKTLS } from '@primuslabs/zktls-js-sdk';
@@ -45,12 +46,27 @@ export function PlatformVerification() {
       try {
         const primus = new PrimusZKTLS();
         const appId = process.env.NEXT_PUBLIC_PRIMUS_APP_ID;
-        if (appId) {
-          await primus.init(appId);
+        if (!appId) {
+          console.error('NEXT_PUBLIC_PRIMUS_APP_ID is not configured');
+          return;
+        }
+        console.log('Initializing Primus SDK with appId:', appId);
+        const initResult = await primus.init(appId);
+        console.log('Primus SDK initialization result:', initResult);
+        
+        // Verify that the SDK is properly initialized before setting it
+        if (initResult && primus) {
           setPrimusZKTLS(primus);
+        } else {
+          throw new Error('SDK initialization returned invalid result');
         }
       } catch (error) {
         console.error('Failed to initialize Primus SDK:', error);
+        toast({
+          title: 'Initialization Error',
+          description: 'Failed to initialize Primus SDK. Please refresh the page.',
+          variant: 'destructive',
+        });
       }
     };
 
@@ -65,6 +81,7 @@ export function PlatformVerification() {
 
   const fetchPlatformData = async () => {
     try {
+      console.log('Fetching platform data...');
       const response = await fetch('/api/platforms/status', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
@@ -73,7 +90,10 @@ export function PlatformVerification() {
       
       if (response.ok) {
         const data = await response.json();
+        console.log('Platform data received:', data);
         setPlatforms(data.platforms || []);
+      } else {
+        console.error('Failed to fetch platforms:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to fetch platform data:', error);
@@ -81,7 +101,14 @@ export function PlatformVerification() {
   };
 
   const handleVerifyPlatform = async (platformId: string, templateId: string) => {
-    if (!primusZKTLS || !address) return;
+    if (!primusZKTLS || !address) {
+      toast({
+        title: 'Not Ready',
+        description: 'Primus SDK is not initialized or wallet not connected. Please wait or refresh the page.',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     setLoading(prev => ({ ...prev, [platformId]: true }));
 
@@ -119,6 +146,17 @@ export function PlatformVerification() {
 
       const { signResult } = await signResponse.json();
 
+      if (!signResult) {
+        throw new Error('Empty signature result from server');
+      }
+
+      console.log('Starting attestation with signResult:', signResult);
+      
+      // Verify primusZKTLS is still properly initialized
+      if (!primusZKTLS) {
+        throw new Error('Primus SDK instance is null');
+      }
+
       // Start attestation process
       const attestation = await primusZKTLS.startAttestation(signResult);
       console.log('Attestation result:', attestation);
@@ -137,18 +175,24 @@ export function PlatformVerification() {
           body: JSON.stringify({
             platform: platformId,
             attestation,
-            verificationData: attestation.data,
+            verificationData: attestation.data || JSON.stringify(attestation),
           }),
         });
 
         if (saveResponse.ok) {
+          console.log('Verification saved successfully');
           toast({
             title: 'Verification successful',
             description: `${platformId} platform has been verified successfully!`,
           });
           
-          // Refresh platform data
-          fetchPlatformData();
+          // Trigger global refresh event
+          platformEvents.emit();
+          
+          // Add small delay before refreshing to ensure data is saved
+          setTimeout(() => {
+            fetchPlatformData();
+          }, 1000);
         } else {
           throw new Error('Failed to save verification result');
         }

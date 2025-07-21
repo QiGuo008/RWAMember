@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
+import { savePlatformVerification } from '../../lib/mock-database';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-
-// Mock database - in production, use PostgreSQL
-const mockDatabase: { [address: string]: PlatformData[] } = {};
-
-interface PlatformData {
-  platform: string;
-  isConnected: boolean;
-  data: string;
-  attestation: any;
-  verifiedAt: string;
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,27 +27,8 @@ export async function POST(request: NextRequest) {
 
     const address = decoded.address;
 
-    // Initialize user data if doesn't exist
-    if (!mockDatabase[address]) {
-      mockDatabase[address] = [];
-    }
-
-    // Find existing platform verification or create new one
-    const existingIndex = mockDatabase[address].findIndex(p => p.platform === platform);
-    
-    const platformData = {
-      platform,
-      isConnected: true,
-      data: verificationData,
-      attestation,
-      verifiedAt: new Date().toISOString(),
-    };
-
-    if (existingIndex >= 0) {
-      mockDatabase[address][existingIndex] = platformData;
-    } else {
-      mockDatabase[address].push(platformData);
-    }
+    // Save platform verification using shared database
+    savePlatformVerification(address, platform, attestation, verificationData);
 
     return NextResponse.json({ 
       success: true,

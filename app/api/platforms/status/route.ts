@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
+import { getUserPlatforms } from '../../lib/mock-database';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-
-// Mock database - in production, use PostgreSQL
-const mockDatabase: { [address: string]: PlatformData[] } = {};
-
-interface PlatformData {
-  platform: string;
-  isConnected: boolean;
-  data: string;
-  attestation: any;
-  verifiedAt: string;
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -30,7 +20,7 @@ export async function GET(request: NextRequest) {
     }
 
     const address = decoded.address;
-    const platforms = mockDatabase[address] || [];
+    const platforms = getUserPlatforms(address);
 
     return NextResponse.json({ 
       platforms,

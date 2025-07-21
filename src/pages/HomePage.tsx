@@ -16,7 +16,7 @@ import { usePlatformStatus } from "@/hooks/usePlatformStatus"
 function HomePage() {
   const isMobile = useIsMobile()
   const [activeTab, setActiveTab] = useState("all")
-  const { platforms, loading, error } = usePlatformStatus()
+  const { platforms, loading, error, refetch } = usePlatformStatus()
 
   // Sample data for shared memberships
   const sharedMemberships = [
