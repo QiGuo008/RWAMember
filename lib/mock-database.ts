@@ -1,6 +1,6 @@
 // Database operations for platform verification data
 import { prisma } from './prisma'
-import { Prisma } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 
 export interface PlatformData {
   platform: string;
