@@ -19,7 +19,7 @@ export interface TransactionVerification {
 /**
  * Verify a transaction on Monad testnet
  * @param txHash - Transaction hash to verify
- * @param expectedTo - Expected recipient address (ADMIN_ADDRESS)
+ * @param expectedTo - Expected recipient address (NEXT_PUBLIC_ADMIN_ADDRESS)
  * @param expectedAmount - Expected amount in MON (e.g., "0.1")
  * @returns Promise<TransactionVerification>
  */

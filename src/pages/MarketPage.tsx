@@ -21,6 +21,7 @@ interface SharedMembership {
   timesShared: number
   maxShares: number
   createdAt: string
+  activeRentalsCount?: number
   platformData: {
     platform: string
     vipStatus: string
@@ -263,6 +264,7 @@ const MarketPage = () => {
                                     onClick={() => handleRentMembership(membership.id)}
                                     disabled={
                                       membership.ownerId === address || 
+                                      membership.timesShared >= membership.maxShares ||
                                       rentingMembershipId === membership.id ||
                                       isTxPending ||
                                       isWaitingForReceipt
@@ -270,7 +272,9 @@ const MarketPage = () => {
                                   >
                                     {membership.ownerId === address 
                                       ? '自己的分享' 
-                                      : rentingMembershipId === membership.id
+                                      : membership.timesShared >= membership.maxShares
+                                        ? '已被租借'
+                                        : rentingMembershipId === membership.id
                                         ? (isTxPending ? '交易确认中...' : isWaitingForReceipt ? '等待确认...' : '租借')
                                         : '租借'
                                     }

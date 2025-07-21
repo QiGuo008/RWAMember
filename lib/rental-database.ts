@@ -80,7 +80,7 @@ export const createRental = async (
     }
 
     // Verify transaction on blockchain
-    const adminAddress = process.env.ADMIN_ADDRESS;
+    const adminAddress = process.env.NEXT_PUBLIC_ADMIN_ADDRESS;
     if (!adminAddress) {
       throw new Error('Admin address not configured');
     }
@@ -143,7 +143,7 @@ export const createRental = async (
     });
 
     if (activeRentalsCount >= sharedMembership.maxShares) {
-      throw new Error('Maximum shares reached for this membership');
+      throw new Error('该会员已被租借');
     }
 
     // Calculate expiry date
