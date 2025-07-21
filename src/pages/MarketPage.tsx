@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useAccount } from 'wagmi'
+import { useAccount, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi'
+import { parseEther } from 'viem'
 import Header from "@/components/Header"
 import Navigation from "@/components/Navigation"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -45,6 +46,12 @@ const MarketPage = () => {
   const [sharedMemberships, setSharedMemberships] = useState<SharedMembership[]>([])
   const [userRentals, setUserRentals] = useState<Rental[]>([])
   const [loading, setLoading] = useState(true)
+  const [rentingMembershipId, setRentingMembershipId] = useState<string | null>(null)
+
+  const { sendTransaction, data: txHash, error: txError, isPending: isTxPending } = useSendTransaction()
+  const { isLoading: isWaitingForReceipt, isSuccess: isTxSuccess } = useWaitForTransactionReceipt({
+    hash: txHash,
+  })
 
   // Platform display names and colors
   const platformInfo = {
@@ -82,36 +89,73 @@ const MarketPage = () => {
       return
     }
 
-    try {
-      // In a real implementation, this would trigger a Monad transaction
-      const mockTxHash = `0x${Math.random().toString(16).substr(2, 64)}`
-      
-      const response = await fetch('/api/rent', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          sharedMembershipId: membershipId,
-          renterAddress: address,
-          transactionHash: mockTxHash
-        })
-      })
+    const adminAddress = process.env.NEXT_PUBLIC_ADMIN_ADDRESS
+    if (!adminAddress) {
+      alert('管理员地址未配置')
+      return
+    }
 
-      const data = await response.json()
-      
-      if (response.ok) {
-        alert('租借成功！')
-        fetchSharedMemberships()
-        fetchUserRentals()
-      } else {
-        alert(`租借失败: ${data.error}`)
-      }
+    setRentingMembershipId(membershipId)
+
+    try {
+      // Send 0.1 MON transaction to admin address
+      sendTransaction({
+        to: adminAddress as `0x${string}`,
+        value: parseEther('0.1'),
+      })
     } catch (error) {
-      console.error('Error renting membership:', error)
-      alert('租借失败，请稍后重试')
+      console.error('Error initiating transaction:', error)
+      alert('交易发起失败，请稍后重试')
+      setRentingMembershipId(null)
     }
   }
+
+  // Handle successful transaction
+  useEffect(() => {
+    if (isTxSuccess && txHash && rentingMembershipId && address) {
+      const processRental = async () => {
+        try {
+          const response = await fetch('/api/rent', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              sharedMembershipId: rentingMembershipId,
+              renterAddress: address,
+              transactionHash: txHash
+            })
+          })
+
+          const data = await response.json()
+          
+          if (response.ok) {
+            alert('租借成功！')
+            fetchSharedMemberships()
+            fetchUserRentals()
+          } else {
+            alert(`租借失败: ${data.error}`)
+          }
+        } catch (error) {
+          console.error('Error processing rental:', error)
+          alert('租借处理失败，请联系客服')
+        } finally {
+          setRentingMembershipId(null)
+        }
+      }
+
+      processRental()
+    }
+  }, [isTxSuccess, txHash, rentingMembershipId, address])
+
+  // Handle transaction error
+  useEffect(() => {
+    if (txError) {
+      console.error('Transaction error:', txError)
+      alert(`交易失败: ${txError.message}`)
+      setRentingMembershipId(null)
+    }
+  }, [txError])
 
   useEffect(() => {
     const loadData = async () => {
@@ -217,9 +261,19 @@ const MarketPage = () => {
                                   <Button 
                                     size="sm" 
                                     onClick={() => handleRentMembership(membership.id)}
-                                    disabled={membership.ownerId === address}
+                                    disabled={
+                                      membership.ownerId === address || 
+                                      rentingMembershipId === membership.id ||
+                                      isTxPending ||
+                                      isWaitingForReceipt
+                                    }
                                   >
-                                    {membership.ownerId === address ? '自己的分享' : '租借'}
+                                    {membership.ownerId === address 
+                                      ? '自己的分享' 
+                                      : rentingMembershipId === membership.id
+                                        ? (isTxPending ? '交易确认中...' : isWaitingForReceipt ? '等待确认...' : '租借')
+                                        : '租借'
+                                    }
                                   </Button>
                                 </div>
                               </div>

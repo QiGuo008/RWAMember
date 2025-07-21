@@ -1,5 +1,6 @@
 // Database operations for membership rentals
 import { prisma } from './prisma'
+import { verifyTransaction } from './transaction-verify'
 
 export interface MembershipRentalData {
   id: number;
@@ -15,13 +16,84 @@ export interface MembershipRentalData {
   createdAt: string;
 }
 
+/**
+ * Check if a transaction has already been used
+ */
+export const isTransactionUsed = async (transactionHash: string): Promise<boolean> => {
+  try {
+    const existingTx = await prisma.usedTransaction.findUnique({
+      where: { transactionHash }
+    });
+    return !!existingTx;
+  } catch (error) {
+    console.error('Error checking transaction usage:', error);
+    return false;
+  }
+};
+
+/**
+ * Mark a transaction as used
+ */
+export const markTransactionUsed = async (
+  transactionHash: string,
+  fromAddress: string,
+  toAddress: string,
+  amountWei: string,
+  blockNumber: bigint | null,
+  usedFor: string,
+  rentalId?: number
+) => {
+  try {
+    await prisma.usedTransaction.create({
+      data: {
+        transactionHash,
+        fromAddress,
+        toAddress,
+        amountWei,
+        blockNumber: blockNumber ? Number(blockNumber) : null,
+        usedFor,
+        rentalId
+      }
+    });
+  } catch (error) {
+    console.error('Error marking transaction as used:', error);
+    throw error;
+  }
+};
+
 export const createRental = async (
   sharedMembershipId: string,
   renterAddress: string,
-  transactionHash?: string
+  transactionHash: string
 ) => {
   try {
     const membershipId = parseInt(sharedMembershipId);
+    
+    if (!transactionHash) {
+      throw new Error('Transaction hash is required');
+    }
+
+    // Check if transaction has already been used
+    const txUsed = await isTransactionUsed(transactionHash);
+    if (txUsed) {
+      throw new Error('Transaction has already been used');
+    }
+
+    // Verify transaction on blockchain
+    const adminAddress = process.env.ADMIN_ADDRESS;
+    if (!adminAddress) {
+      throw new Error('Admin address not configured');
+    }
+
+    const txVerification = await verifyTransaction(transactionHash, adminAddress, '0.1');
+    if (!txVerification.isValid) {
+      throw new Error(`Transaction verification failed: ${txVerification.error}`);
+    }
+
+    // Verify that the sender is the renter
+    if (txVerification.from.toLowerCase() !== renterAddress.toLowerCase()) {
+      throw new Error('Transaction sender does not match renter address');
+    }
     
     // Find the shared membership with all details
     const sharedMembership = await prisma.sharedMembership.findFirst({
@@ -92,6 +164,19 @@ export const createRental = async (
           expiresAt,
           status: 'active',
           transactionHash
+        }
+      });
+
+      // Mark transaction as used
+      await tx.usedTransaction.create({
+        data: {
+          transactionHash,
+          fromAddress: txVerification.from,
+          toAddress: txVerification.to,
+          amountWei: (BigInt(Math.floor(parseFloat(txVerification.value) * 1e18))).toString(),
+          blockNumber: txVerification.blockNumber ? Number(txVerification.blockNumber) : null,
+          usedFor: 'rental',
+          rentalId: rental.id
         }
       });
 

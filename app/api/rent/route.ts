@@ -6,9 +6,9 @@ export async function POST(request: NextRequest) {
   try {
     const { sharedMembershipId, renterAddress, transactionHash } = await request.json();
 
-    if (!sharedMembershipId || !renterAddress) {
+    if (!sharedMembershipId || !renterAddress || !transactionHash) {
       return NextResponse.json({ 
-        error: 'Shared membership ID and renter address are required' 
+        error: 'Shared membership ID, renter address, and transaction hash are required' 
       }, { status: 400 });
     }
 
@@ -30,6 +30,21 @@ export async function POST(request: NextRequest) {
       }
       if (error.message === 'Maximum shares reached for this membership') {
         return NextResponse.json({ error: error.message }, { status: 409 });
+      }
+      if (error.message === 'Transaction hash is required') {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+      if (error.message === 'Transaction has already been used') {
+        return NextResponse.json({ error: error.message }, { status: 409 });
+      }
+      if (error.message.startsWith('Transaction verification failed')) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+      if (error.message === 'Transaction sender does not match renter address') {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+      if (error.message === 'Admin address not configured') {
+        return NextResponse.json({ error: error.message }, { status: 500 });
       }
     }
     

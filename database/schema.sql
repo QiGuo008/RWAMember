@@ -97,6 +97,23 @@ CREATE INDEX idx_membership_rentals_status ON membership_rentals(status);
 CREATE TRIGGER update_shared_memberships_updated_at BEFORE UPDATE ON shared_memberships
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- Transaction tracking table (prevent double-spending)
+CREATE TABLE used_transactions (
+    id SERIAL PRIMARY KEY,
+    transaction_hash VARCHAR(66) UNIQUE NOT NULL,
+    from_address VARCHAR(42) NOT NULL,
+    to_address VARCHAR(42) NOT NULL,
+    amount_wei VARCHAR(32) NOT NULL, -- Store as string to avoid precision loss
+    block_number BIGINT,
+    used_for VARCHAR(50) NOT NULL, -- 'rental', 'other'
+    rental_id INTEGER REFERENCES membership_rentals(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Index for transaction lookup
+CREATE INDEX idx_used_transactions_hash ON used_transactions(transaction_hash);
+CREATE INDEX idx_used_transactions_from ON used_transactions(from_address);
+
 -- Sample data structure for reference:
 -- Bilibili data: {"current_level":"6","vipDueDate":"1776700800000"}
 -- Youku data: {"exptime":"2026-03-09","is_vip":"1"}

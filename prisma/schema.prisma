@@ -96,6 +96,24 @@ model MembershipRental {
   // Relations
   sharedMembership SharedMembership @relation(fields: [sharedMembershipId], references: [id], onDelete: Cascade)
   renter           User             @relation(fields: [renterId], references: [id], onDelete: Cascade)
+  usedTransaction  UsedTransaction?
 
   @@map("membership_rentals")
+}
+
+model UsedTransaction {
+  id              Int      @id @default(autoincrement())
+  transactionHash String   @unique @map("transaction_hash") @db.VarChar(66)
+  fromAddress     String   @map("from_address") @db.VarChar(42)
+  toAddress       String   @map("to_address") @db.VarChar(42)
+  amountWei       String   @map("amount_wei") @db.VarChar(32)
+  blockNumber     BigInt?  @map("block_number")
+  usedFor         String   @map("used_for") @db.VarChar(50)
+  rentalId        Int?     @unique @map("rental_id")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  rental MembershipRental? @relation(fields: [rentalId], references: [id], onDelete: Cascade)
+
+  @@map("used_transactions")
 }

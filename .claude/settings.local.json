@@ -11,7 +11,8 @@
       "Bash(npm install:*)",
       "Bash(pnpm prisma:*)",
       "Bash(pnpm build:*)",
-      "Bash(npx prisma generate:*)"
+      "Bash(npx prisma generate:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }
